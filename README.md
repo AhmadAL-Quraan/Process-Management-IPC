@@ -67,3 +67,7 @@ How do child processes send their back to the parent? Unlike threads, processes
 This is where **pipes** come in. A pipe is a unidirectional communication channel that allows data to flow from one process to another. Think of it as a virtual tube:
     • One process writes data into one end of the tube
     • Another process reads data from the other end
+
+![](pic/pipes_flow.png)
+
+Why pipes made before fork()? 
