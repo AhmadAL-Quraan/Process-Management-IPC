@@ -61,13 +61,151 @@ A **thread** is a smaller unit of execution **inside a process**.
 | Crash impact  | One process crash ≠ others | One thread crash can affect all |
 
 
-## The Challenge: Communication Between Processes (pipes)
-How do child processes send their back to the parent? Unlike threads, processes do not share memory space. Each process has its own private address space, so a child cannot simply write to a variable in the parent.
+## fork, wait and sleep 
 
-This is where **pipes** come in. A pipe is a unidirectional communication channel that allows data to flow from one process to another. Think of it as a virtual tube:
-    • One process writes data into one end of the tube
-    • Another process reads data from the other end
+### What is a process table  ?
+
+The kernel keeps a big data structure (conceptually a table):
+
+![process table](pic/process_table_ex.png)
+
+Each entry = one process
+
+🔹 What’s stored per process?
+
+Each process has a structure (in Linux it's like task_struct) that includes:
+```
+PID → Process ID (unique)
+
+PPID → Parent Process ID
+
+State → running / sleeping / zombie
+
+Registers / CPU state
+
+Memory info
+
+Open files
+
+List of children
+```
+
+![mental mode](pic/fork-wait-sleep-C++.png)
+
+### fork
+* It's a system call (function), that creates a new process.
+```C++
+pid_t pid = fork();
+```
+
+-> The OS creates a child process.
+
+-> It will executes after the fork() line.
+
+So:
+
+- The original process → called the parent
+
+- The newly created process → called the child
+
+- It's a fork() so it's will copy for everything the parent until that moment has, like code segment, same stack (variables), same heap, ...
+
+>It's not guaranteed who will run first.
+
+
+> Number of processes in any C++ file = **2 ^ n**, n = number of fork() in this code.
+
+### Wait 
+wait() makes a parent process block until one of its child processes terminates, and then collects its exit status.
+
+In other words suspends a parent process until a child finishes.
+```C++
+
+int main() {
+  pid_t pid = fork();
+
+  if (pid == 0) {
+    std::cout << "Child running\n";
+    sleep(2); // simulate work
+    std::cout << "Child done\n";
+  } else {
+    std::cout << "Parent waiting...\n";
+    wait(NULL); // wait for child to finish
+    std::cout << "Parent resumes after child\n";
+  }
+
+  return 0;
+}
+
+```
+
+What really happens (conceptually)
+
+* When a process calls:
+
+  ` wait(NULL);`
+
+* The kernel already knows for each process its children (using the process table)
+Checks:
+
+  * Do I have any children?
+
+    ❌ No → return -1
+
+    ✅ Yes:
+
+        If one already exited → return immediately
+    Otherwise → block until one exits
+
+
+* You can make it wait for all children
+```C++
+while (wait(NULL) > 0);
+```
+
+
+
+## The Challenge: Communication Between Processes (pipes)
+How do child processes send their back to the parent?
+
+Unlike threads, processes do not share memory space. Each process has its own private address space, so a child cannot simply write to a variable in the parent.
+
+-> This is where **pipes** come in. A pipe is a unidirectional communication channel (one way only), that allows data to flow from one process to another. Think of it as a virtual tube:
+
+  • One process writes data into one end of the tube
+
+  • Another process reads data from the other end
 
 ![](pic/pipes_flow.png)
 
-Why pipes made before fork()? 
+* Pipes should be made before fork()? 
+  
+  Because to make it shareable between them, we must make it before.
+
+
+
+* Pipes is a one way communication between `parent -> child`, if we need otherwise we must open another pipe `child -> parent`.
+```C++
+buffer[1] ──> [ KERNEL PIPE BUFFER ] ──> buffer[0]
+```
+
+❌ Why not buffer[3] or more?
+
+Because:
+
+The kernel only returns two file descriptors
+There are only two roles:
+read
+write
+
+If you do:
+
+```C++
+int buffer[3];
+pipe(buffer);
+```
+👉 The kernel will:
+
+fill buffer[0] and buffer[1],
+ignore buffer[2] completely
+
