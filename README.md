@@ -254,7 +254,7 @@ pipes[0] ─────────────► [ PIPE OBJECT ] ◄───
 ```
 
 
-### Questions 
+## Questions 
 #### In pipes Why can't we do buffer[3] or more?
 
 Because:
