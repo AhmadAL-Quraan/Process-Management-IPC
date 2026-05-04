@@ -13,7 +13,8 @@ In this problem, you will explore process creation, inter-process communication 
 
 # Concepts
 
-## Process
+## Process vs Thread
+### Process
 
 - Has its **own memory space** (address space): **Address space** is basically the **range of memory addresses a program (process) is allowed to use**.
 - 👉 It’s like each process thinks it owns the whole memory, even though the OS is managing everything behind the scenes.
@@ -25,7 +26,7 @@ In this problem, you will explore process creation, inter-process communication 
 
 
 
-## Threads
+### Threads
 
 A **thread** is a smaller unit of execution **inside a process**.
 
