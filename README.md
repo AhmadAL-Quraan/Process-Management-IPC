@@ -255,7 +255,7 @@ pipes[0] ─────────────► [ PIPE OBJECT ] ◄───
 
 
 ## Questions 
-#### In pipes Why can't we do buffer[3] or more?
+### In pipes Why can't we do buffer[3] or more?
 
 Because:
 
@@ -275,7 +275,7 @@ pipe(buffer);
 `fill buffer[0] and buffer[1],
 ignore buffer[2] completely`.
 
-#### How does buffer[1] used for write and buffer[0] for read 
+### How does buffer[1] used for write and buffer[0] for read 
 * It’s defined behavior of the Unix API.
 
 When you call: 
@@ -290,7 +290,7 @@ The system guarantees:
 * buffer[1] -> write end
 
 
-#### How does pipes fits with fork() 
+### How does pipes fits with fork() 
 
 * After fork():
   
@@ -317,7 +317,7 @@ write(pipes[1], msg, strlen(msg) + 1);
 >Using pipes after closing them → Results in "bad file descriptor" errors
 
 
-#### Why do we need to **close** unused pipe ends in both parent and child processes? What would happen if we didn't close them 
+### Why do we need to **close** unused pipe ends in both parent and child processes? What would happen if we didn't close them 
 > read() returns 0 (EOF) only when pipe is empty and all write ends (from all processes in the program) are closed.
 
 If you don’t close unused write ends:
@@ -357,7 +357,7 @@ This can cause:
 - Hard-to-debug behavior.
 - Incorrect assumptions about who is communicating.
 
-#### How many possible cases of read() in pipes:
+### How many possible cases of read() in pipes:
 
 1) Data is already available,
 read() returns immediately
@@ -377,7 +377,7 @@ You get the data .
 > `read()` removes data: reading consumes (removes) the data from the pipe
 
 
-#### If read() do blocking, why I need to use wait () ?
+### If read() do blocking, why I need to use wait () ?
 
 * They are used for different purposes :
 
