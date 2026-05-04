@@ -1,5 +1,30 @@
 # IPC - Inter-Process Communication Using fork() and Pipes
 
+# Table of Contents
+
+- [IPC - Inter-Process Communication Using fork() and Pipes](#ipc---inter-process-communication-using-fork-and-pipes)
+- [Problem](#problem)
+- [Key OS Concepts Covered](#key-os-concepts-covered)
+- [Concepts](#concepts)
+  - [Process vs Thread](#process-vs-thread)
+    - [Process](#process)
+    - [Threads](#threads)
+  - [Difference](#difference)
+  - [fork, wait and sleep](#fork-wait-and-sleep)
+    - [What is a process table](#what-is-a-process-table)
+  - [fork](#fork)
+  - [Wait](#wait)
+- [The Challenge: Communication Between Processes (pipes)](#the-challenge-communication-between-processes-pipes)
+  - [Questions](#questions)
+    - [In pipes Why can't we do buffer[3] or more?](#in-pipes-why-cant-we-do-buffer3-or-more)
+    - [How does buffer[1] used for write and buffer[0] for read](#how-does-buffer1-used-for-write-and-buffer0-for-read)
+    - [How does pipes fits with fork()](#how-does-pipes-fits-with-fork)
+    - [Why do we need to close unused pipe ends in both parent and child processes? What would happen if we didn't close them](#why-do-we-need-to-close-unused-pipe-ends-in-both-parent-and-child-processes-what-would-happen-if-we-didnt-close-them)
+    - [How many possible cases of read() in pipes:](#how-many-possible-cases-of-read-in-pipes)
+    - [If read() do blocking, why I need to use wait () ?](#if-read-do-blocking-why-i-need-to-use-wait--)
+
+
+
 # Problem 
 
 In this problem, you will explore process creation, inter-process communication (IPC), and parallel algorithm design by implementing a parallel sum calculator. The problem is deceptively simple: given a large array (vector) of floating-point numbers, compute the total sum. However, instead of computing the sum sequentially in a single loop, you will divide the work among multiple child processes, each summing a portion of the array in parallel.
@@ -10,6 +35,13 @@ In this problem, you will explore process creation, inter-process communication 
         ◦ Inter-process communication (pipes)
         ◦ Resource management (file descriptors)
         ◦ Process termination and cleanup
+
+# Key OS Concepts Covered
+- fork() → Process creation
+- wait() → Process synchronization
+- Pipes → IPC mechanism
+- File descriptors → Resource handling
+- Process lifecycle → creation → execution → cleanup
 
 # Concepts
 
