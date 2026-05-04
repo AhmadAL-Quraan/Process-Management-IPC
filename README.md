@@ -14,7 +14,7 @@
   - [fork](#fork)
   - [Wait](#wait)
 - [The Challenge: Communication Between Processes (pipes)](#the-challenge-communication-between-processes-pipes)
-  - [Questions](#questions)
+- [Questions](#questions)
     - [In pipes Why can't we do buffer[3] or more?](#in-pipes-why-cant-we-do-buffer3-or-more)
     - [How does buffer[1] used for write and buffer[0] for read](#how-does-buffer1-used-for-write-and-buffer0-for-read)
     - [How does pipes fits with fork()](#how-does-pipes-fits-with-fork)
