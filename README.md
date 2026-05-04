@@ -384,3 +384,10 @@ You get the data .
 | `wait()` | Block if there is a **child process still** |
 
 Getting the data ≠ the child has fully finished.
+
+
+
+## Next 
+
+* Implement the full solution code according to the template given .
+* Make a video explaining how and why .
