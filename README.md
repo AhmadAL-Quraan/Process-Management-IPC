@@ -8,7 +8,6 @@
   - [Process vs Thread](#process-vs-thread)
     - [Process](#process)
     - [Threads](#threads)
-    - [Difference](#difference)
   - [fork, wait and sleep](#fork-wait-and-sleep)
     - [What is a process table](#what-is-a-process-table)
   - [fork](#fork)
@@ -80,9 +79,7 @@ A **thread** is a smaller unit of execution **inside a process**.
 
 👉 Example: A browser tab loadingmages, scripts,  iand UI simultaneously — using threads.
 
-
-
-## Difference
+So:
 
 | Feature       | Process 🧠                 | Thread 🧵                       |
 | ------------- | -------------------------- | ------------------------------- |
