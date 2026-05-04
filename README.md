@@ -1,4 +1,4 @@
-# Process vs Threads
+# IPC - Inter-Process Communication Using fork() and Pipes
 
 # Problem 
 
