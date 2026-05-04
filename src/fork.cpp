@@ -9,9 +9,9 @@ int main() {
   cout << "After execution" << '\n';
 
   if (pid == 0) {
-    cout << "I'm a child bitch" << '\n';
+    cout << "I'm a child" << '\n';
   } else {
-    cout << "I'm a parent nigga" << '\n';
+    cout << "I'm a parent" << '\n';
   }
   return 0;
 }

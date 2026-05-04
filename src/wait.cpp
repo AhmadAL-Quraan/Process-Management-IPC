@@ -13,7 +13,8 @@ int main() {
     std::cout << "Child done\n";
   } else {
     std::cout << "Parent waiting...\n";
-    wait(NULL); // wait for child to finish
+    while (wait(NULL) > 0)
+      ; // wait for child to finish
     std::cout << "Parent resumes after child\n";
   }
 
