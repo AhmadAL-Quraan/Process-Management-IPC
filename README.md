@@ -2,7 +2,6 @@
 
 # Table of Contents
 
-- [IPC - Inter-Process Communication Using fork() and Pipes](#ipc---inter-process-communication-using-fork-and-pipes)
 - [Problem](#problem)
 - [Key OS Concepts Covered](#key-os-concepts-covered)
 - [Concepts](#concepts)
