@@ -8,7 +8,7 @@
   - [Process vs Thread](#process-vs-thread)
     - [Process](#process)
     - [Threads](#threads)
-  - [fork, wait, pipes](#fork-wait-and-pipes)
+  - [fork, wait and pipes](#fork-wait-and-pipes)
     - [What is a process table](#what-is-a-process-table)
     - [fork](#fork)
     - [Wait](#wait)
