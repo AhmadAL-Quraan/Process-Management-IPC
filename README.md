@@ -63,7 +63,7 @@ A **thread** is a smaller unit of execution **inside a process**.
 
 ## fork, wait and sleep 
 
-### What is a process table  ?
+#### What is a process table  ?
 
 The kernel keeps a big data structure (conceptually a table):
 
@@ -92,7 +92,7 @@ List of children
 
 ![mental mode](pic/fork-wait-sleep-C++.png)
 
-### fork
+## fork
 * It's a system call (function), that creates a new process.
 ```C++
 pid_t pid = fork();
@@ -100,7 +100,7 @@ pid_t pid = fork();
 
 -> The OS creates a child process.
 
--> It will executes after the fork() line.
+-> It will executes after the fork() line, how ? the new process will copy the parent process buffer, data and such, so it's a small clone of it .
 
 So:
 
@@ -108,14 +108,12 @@ So:
 
 - The newly created process → called the child
 
-- It's a fork() so it's will copy for everything the parent until that moment has, like code segment, same stack (variables), same heap, ...
-
 >It's not guaranteed who will run first.
 
 
-> Number of processes in any C++ file = **2 ^ n**, n = number of fork() in this code.
+> Number of processes = **2 ^ n**, n = number of fork() in this code.
 
-### Wait 
+## Wait 
 wait() makes a parent process block until one of its child processes terminates, and then collects its exit status.
 
 In other words suspends a parent process until a child finishes.
@@ -189,7 +187,7 @@ Unlike threads, processes do not share memory space. Each process has its own pr
 buffer[1] ──> [ KERNEL PIPE BUFFER ] ──> buffer[0]
 ```
 
-❌ Why not buffer[3] or more?
+#### ❌ Why not buffer[3] or more?
 
 Because:
 
@@ -206,6 +204,40 @@ pipe(buffer);
 ```
 👉 The kernel will:
 
-fill buffer[0] and buffer[1],
-ignore buffer[2] completely
+`fill buffer[0] and buffer[1],
+ignore buffer[2] completely`.
+
+#### How does buffer[1] used for write and buffer[0] for read 
+* It’s defined behavior of the Unix API.
+
+When you call: 
+```C++
+int buffer[2];
+pipe(buffer)
+```
+    
+The system guarantees: 
+
+* `buffer[0]` -> read end 
+* buffer[1] -> write end
+
+
+#### How it fits with fork() 
+
+* After fork():
+  
+  * Both parent and child inherit both file descriptors.
+  * So each process must close the end it doesn’t use.
+
+Child:
+```C++
+close(pipes[1]); // doesn’t write
+read(pipes[0], buffer, sizeof(buffer));
+```
+
+Parent: 
+```C++
+close(pipes[0]); // doesn’t read
+write(pipes[1], msg, strlen(msg) + 1);
+```
 
