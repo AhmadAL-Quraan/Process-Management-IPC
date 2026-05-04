@@ -98,9 +98,13 @@ List of children
 pid_t pid = fork();
 ```
 
--> The OS creates a child process.
+→ The OS creates a child process.
 
--> It will executes after the fork() line, how ? the new process will copy the parent process buffer, data and such, so it's a small clone of it .
+→ It will executes after the fork() line, how ? the new process will copy the parent process memory space (stack, heap, Global/ static var, fd), by using a COW method (copy on write) .
+
+* **Initially**: 
+Parent and child share the same physical memory pages.
+* **Only when one modifies memory**: The kernel creates a separate copy for that process.
 
 So:
 
@@ -113,10 +117,20 @@ So:
 
 > Number of processes = **2 ^ n**, n = number of fork() in this code.
 
+> Not checking fork() return value → Unpredictable behavior
+
 ## Wait 
 wait() makes a parent process block until one of its child processes terminates, and then collects its exit status.
 
 In other words suspends a parent process until a child finishes.
+
+* It's useful because: 
+  1) Synchronization:
+        Parent waits for children to finish before continuing.
+
+  2) Cleanup: (VERY important)
+Removes zombie processes
+Frees kernel resources
 ```C++
 
 int main() {
@@ -148,12 +162,11 @@ Checks:
 
   * Do I have any children?
 
-    ❌ No → return -1
+    - ❌ No → return -1
 
-    ✅ Yes:
+    - ✅ Yes:
 
         If one already exited → return immediately
-    Otherwise → block until one exits
 
 
 * You can make it wait for all children
@@ -161,6 +174,20 @@ Checks:
 while (wait(NULL) > 0);
 ```
 
+> Not waiting for children → Zombie processes consume system resources
+
+#### ⚠️ What happens if parent does NOT call wait()?
+
+❌ 1. Zombie processes appear
+
+* Child finishes → becomes zombie:
+
+* Child: finished ❌ (still in process table)
+
+If many children:
+
+* You get many zombies
+System resources get wasted
 
 
 ## The Challenge: Communication Between Processes (pipes)
@@ -170,9 +197,9 @@ Unlike threads, processes do not share memory space. Each process has its own pr
 
 -> This is where **pipes** come in. A pipe is a unidirectional communication channel (one way only), that allows data to flow from one process to another. Think of it as a virtual tube:
 
-  • One process writes data into one end of the tube
+  • One process **writes** data into one end of the tube, `write()`
 
-  • Another process reads data from the other end
+  • Another process **reads** data from the other end, `read()`
 
 ![](pic/pipes_flow.png)
 
@@ -187,7 +214,16 @@ Unlike threads, processes do not share memory space. Each process has its own pr
 buffer[1] ──> [ KERNEL PIPE BUFFER ] ──> buffer[0]
 ```
 
-#### ❌ Why not buffer[3] or more?
+```
+Process FD table        Kernel space
+
+pipes[0] ─────────────► [ PIPE OBJECT ] ◄───────────── pipes[1]
+   (read end)              (buffer)                     (write end)
+```
+
+
+### Questions 
+#### In pipes Why can't we do buffer[3] or more?
 
 Because:
 
@@ -222,7 +258,7 @@ The system guarantees:
 * buffer[1] -> write end
 
 
-#### How it fits with fork() 
+#### How does pipes fits with fork() 
 
 * After fork():
   
@@ -235,9 +271,87 @@ close(pipes[1]); // doesn’t write
 read(pipes[0], buffer, sizeof(buffer));
 ```
 
+> A read() returns EOF (0) only when ALL write ends of the pipe are closed.
+
 Parent: 
 ```C++
 close(pipes[0]); // doesn’t read
 write(pipes[1], msg, strlen(msg) + 1);
 ```
 
+
+> Forgetting to close pipe end -> Process hangs forever waiting for data.
+
+>Using pipes after closing them → Results in "bad file descriptor" errors
+
+
+#### Why do we need to **close** unused pipe ends in both parent and child processes? What would happen if we didn't close them 
+> read() returns 0 (EOF) only when pipe is empty and all write ends (from all processes in the program) are closed.
+
+If you don’t close unused write ends:
+The kernel sees: “there is still a writer alive”
+So it assumes more data might come
+👉 read() will block instead of returning EOF
+Result:
+
+Programs that read in a loop can **hang forever**
+
+
+```C++
+while (read(fd, buf, size) > 0) {
+    // process data
+}
+/*
+
+If any process (parent or child) still has the write end open:
+
+read() never gets EOF
+Loop never ends → 💥 hang
+*/
+```
+
+Also:
+
+* Each process inherits both ends after fork().
+
+* If you don’t close:
+
+  * A “reader” process still has a write end
+  * A “writer” process still has a read end
+
+This can cause:
+
+- Confusing bugs.
+- Hard-to-debug behavior.
+- Incorrect assumptions about who is communicating.
+
+#### How many possible cases of read() in pipes:
+
+1) Data is already available,
+read() returns immediately
+You get the data .
+
+2) No data yet, but at least one process has the write fd.
+* `read()`: blocks (waits) for other writes to finish (close).
+*  Blocking here comes from `read()` itself, not from `wait()` or `sleep()`.
+
+3) No data and no writers left.
+* `read()` returns 0 -> EOF
+
+4) There exist data but some processes still has the `write()` fd for the pipe -> return the available data and no blocking will happen unless you call the `read()` again and other processes still has `writer()` fd.
+
+> Pipe works as a FIFO queue (First-In First-Out), write() data on top of the queue, read() remove from the top.
+
+> `read()` removes data: reading consumes (removes) the data from the pipe
+
+
+#### If read() do blocking, why I need to use wait () ?
+
+* They are used for different purposes :
+
+| Function | Waits for…                     |
+| -------- | ------------------------------ |
+| `read()` | Block if empty and at least one write() still open. |
+| `wait()` | Block if there is a **child process still** |
+
+Getting the data ≠ the child has fully finished.
