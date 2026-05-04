@@ -8,11 +8,11 @@
   - [Process vs Thread](#process-vs-thread)
     - [Process](#process)
     - [Threads](#threads)
-  - [fork, wait and sleep](#fork-wait-and-sleep)
+  - [fork, wait, pipes](#fork-wait-and-pipes)
     - [What is a process table](#what-is-a-process-table)
-  - [fork](#fork)
-  - [Wait](#wait)
-- [The Challenge: Communication Between Processes (pipes)](#the-challenge-communication-between-processes-pipes)
+    - [fork](#fork)
+    - [Wait](#wait)
+    - [The Challenge: Communication Between Processes (pipes)](#the-challenge-communication-between-processes-pipes)
 - [Questions](#questions)
     - [In pipes Why can't we do buffer[3] or more?](#in-pipes-why-cant-we-do-buffer3-or-more)
     - [How does buffer[1] used for write and buffer[0] for read](#how-does-buffer1-used-for-write-and-buffer0-for-read)
@@ -90,9 +90,9 @@ So:
 | Crash impact  | One process crash ≠ others | One thread crash can affect all |
 
 
-## fork, wait and sleep 
+## fork, wait and pipes  
 
-#### What is a process table  ?
+### What is a process table  ?
 
 The kernel keeps a big data structure (conceptually a table):
 
