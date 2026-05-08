@@ -3,7 +3,7 @@
 # Table of Contents
 
 - [Problem](#problem)
-- [Key OS Concepts Covered](#key-os-concepts-covered)
+- [Concepts Covered](#concepts-covered)
 - [Concepts](#concepts)
   - [Process vs Thread](#process-vs-thread)
     - [Process](#process)
@@ -34,7 +34,7 @@ In this problem, you will explore process creation, inter-process communication 
         ◦ Resource management (file descriptors)
         ◦ Process termination and cleanup
 
-# Key OS Concepts Covered
+# Concepts Covered
 - fork() → Process creation
 - wait() → Process synchronization
 - Pipes → IPC mechanism
