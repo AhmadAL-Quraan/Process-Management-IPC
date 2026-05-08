@@ -20,7 +20,7 @@
     - [Why do we need to close unused pipe ends in both parent and child processes? What would happen if we didn't close them](#why-do-we-need-to-close-unused-pipe-ends-in-both-parent-and-child-processes-what-would-happen-if-we-didnt-close-them)
     - [How many possible cases of read() in pipes:](#how-many-possible-cases-of-read-in-pipes)
     - [If read() do blocking, why I need to use wait () ?](#if-read-do-blocking-why-i-need-to-use-wait--)
-      
+- [Task Questions](#task-questions)
 
 
 # Problem 
