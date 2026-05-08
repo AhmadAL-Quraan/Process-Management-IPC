@@ -251,7 +251,7 @@ pipes[0] ─────────────► [ PIPE OBJECT ] ◄───
 ```
 
 
-## Questions 
+## Questions about pipes
 ### In pipes Why can't we do buffer[3] or more?
 
 Because:
@@ -386,8 +386,59 @@ You get the data .
 Getting the data ≠ the child has fully finished.
 
 
+## Task Questions
 
+1) **Explain what happens when fork() is called inside the loop. Why don't the child processes create grandchildren ?**
+
+ *When fork() is called, the operating system creates a child process that is a copy of the parent process. Both parent and child continue execution from the line after fork(). The child receives a return value of 0, while the parent receives the child’s PID.*
+
+*Child processes do not create grandchildren because the child executes:*
+```C++
+return 0;
+```
+ *Which terminates the child process before it can continue the loop and call `fork()` again.*
+
+---
+2) **Why do we need to close unused pipe ends in both parent and child processes? What would happen if we didn't close them?**
+
+read() returns 0 (EOF) only when all write ends are closed.
+
+If you don’t close unused write ends:
+
+    • The kernel sees: “there is still a writer alive” 
+    • So it assumes more data might come 
+    • 👉 read() will block instead of returning EOF 
+Result:
+
+    • Programs that read in a loop can hang forever.
+---
+3) **Explain the purpose of the wait(NULL) function call. What would happen if the parent didn't wait for children?**
+
+wait(NULL) makes the parent process wait for a child process to terminate. This allows the parent to properly collect the child’s exit status and prevents **zombie processes**.
+
+If the parent does not wait for children, terminated child processes remain in the process table as zombie processes, wasting system resources.
+
+--- 
+
+4) **Why do we need a separate pipe for each child process? Could we use a single pipe for all children? Explain**
+
+A separate pipe for each child simplifies communication because each child writes to its own dedicated pipe, avoiding interference between messages.
+
+Yes, you can use same pipe for all of them but mixing of data will happened so no sync and Unpredictable behavior will happen, also race conditions.
+
+--- 
+5) **What is the purpose of the close(pipes[i][1]) call in the parent process before reading?**
+
+The purpose of `close(pipes[i][1])` in the parent process is to indicate that the parent will not **write to the pipe**. This is important for correct **EOF** behavior, since a `read()` call only returns **EOF** when **all write ends of the pipe are closed**. If the parent **does not close its write end**, the kernel assumes that more data may still be written, which can cause the `read()` operation to **block indefinitely**. Additionally, closing unused pipe ends helps maintain proper resource management and prevents unintended behavior.
+
+--- 
+6) **Explain the blocking behavior of read(). What happens if a child process hasn't written its sum yet when the parent calls read()?**
+
+`read()` is a blocking system call.
+
+If the pipe is **empty** and **at least one write end is still open**, `read()` blocks and waits (freeze the process) until data becomes available.
 ## Next 
 
-* Implement the full solution code according to the template given .
+* ~~Implement the full solution code according to the template given.~~
 * Make a video explaining how and why .
+
