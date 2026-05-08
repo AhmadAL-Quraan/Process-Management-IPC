@@ -437,6 +437,30 @@ The purpose of `close(pipes[i][1])` in the parent process is to indicate that th
 `read()` is a blocking system call.
 
 If the pipe is **empty** and **at least one write end is still open**, `read()` blocks and waits (freeze the process) until data becomes available.
+
+## Sample output 
+
+```C++ 
+> $ g++ task.cpp -o task  && ./task 12 5                                                                                                                                             [±main ●]
+Vector values (first 10): -68.6869 -9.32153 -69.1605 56.8665 -15.1642 -35.8018 -65.1238 63.6969 3.28178 23.0511 
+
+Creating 5 child processes
+
+Process child number 1, It's PID= 437660 has partial sum -147.168884
+ and range of values indices [0-3], so total 3 values.
+Process child number 2, It's PID= 437661 has partial sum 5.900528
+ and range of values indices [3-6], so total 3 values.
+Process child number 3, It's PID= 437662 has partial sum -1.426842
+ and range of values indices [6-8], so total 2 values.
+Process child number 4, It's PID= 437663 has partial sum 26.332840
+ and range of values indices [8-10], so total 2 values.
+Process child number 5, It's PID= 437664 has partial sum -3.612514
+ and range of values indices [10-12], so total 2 values.
+
+
+Parallel summation = -119.97
+Sequential sum (no child processes, only parent) = -119.97%
+```
 ## Next 
 
 * ~~Implement the full solution code according to the template given.~~
